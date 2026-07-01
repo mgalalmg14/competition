@@ -520,7 +520,7 @@ function renderChecks() {
   el.innerHTML = lessons.map((ls,i) => `
     <div class="lsck ${selLs.has(i)?'sel':''}" onclick="togLs(${i})">
       <input type="checkbox" ${selLs.has(i)?'checked':''} onclick="event.stopPropagation();togLs(${i})">
-      <span>📖 ${ls.name} — ${ls.questions.length} سؤال</span>
+      <span>📖 ${ls.name} — ${(ls.questions||[]).length} سؤال</span>
     </div>`).join('');
 }
 function togLs(i) {
@@ -557,6 +557,7 @@ function addQ() {
   const pts = parseInt(document.getElementById('nq-pts').value)||10;
   const time = parseInt(document.getElementById('nq-tm').value)||30;
   if(!text||!a||!b||!c||!d) { notif('أكمل جميع الحقول'); return; }
+  if(!lessons[editLs].questions) lessons[editLs].questions = [];
   lessons[editLs].questions.push({text,a,b,c,d,correct:cor,pts,time});
   ['nq-t','nq-a','nq-b','nq-c','nq-d'].forEach(id => document.getElementById(id).value='');
   saveLessons(); renderLessons(); renderChecks();
@@ -564,6 +565,7 @@ function addQ() {
 }
 function delQ(li,qi) {
   if(!confirm('حذف السؤال؟')) return;
+  if(!lessons[li].questions) lessons[li].questions = [];
   lessons[li].questions.splice(qi,1);
   saveLessons(); renderLessons();
 }
@@ -575,12 +577,12 @@ function renderLessons() {
       <div class="lshdr">
         <span style="font-size:13px;font-weight:700;color:#f1f5f9">📖 ${ls.name}</span>
         <div style="display:flex;gap:5px;align-items:center">
-          <span class="badge b-blue">${ls.questions.length} سؤال</span>
+          <span class="badge b-blue">${(ls.questions||[]).length} سؤال</span>
           <button class="blue sm" onclick="openAddQ(${li})">+ سؤال</button>
           <button class="red sm" onclick="delLesson(${li})">حذف</button>
         </div>
       </div>
-      ${ls.questions.length ? ls.questions.map((q,qi) => `
+      ${(ls.questions||[]).length ? (ls.questions||[]).map((q,qi) => `
         <div class="qrow">
           <span class="qnum">${qi+1}</span>
           <span class="qtxt">${q.text}</span>
